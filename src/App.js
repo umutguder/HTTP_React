@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 
 import MoviesList from "./components/MoviesList";
 import "./App.css";
+import Button from "./components/UI/Button";
 
 function App() {
   const [movies, setMovies] = useState([]);
@@ -61,7 +62,7 @@ function App() {
   return (
     <React.Fragment>
       <section>
-        <button onClick={fetchMoviesHandler}>Fetch Movies</button>
+        <Button onClick={fetchMoviesHandler}>Fetch Movies</Button>
       </section>
       <section>
         {!isLoading && movies.length > 0 && <MoviesList movies={movies} />}
