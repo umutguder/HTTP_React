@@ -1,51 +1,43 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 
 import MoviesList from "./components/MoviesList";
 import NewMovie from "./components/NewMovie";
 import Button from "./components/UI/Button";
 import "./App.css";
-
-import classes from "./components/Home.module.css";
+import useHttp from "./hooks/use-http";
 
 function App() {
   const [movies, setMovies] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
 
-  const fetchMoviesHandler = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const response = await fetch(
-        "https://react-http-8f511-default-rtdb.firebaseio.com/movies.json"
-      );
-      if (!response.ok) {
-        throw new Error("Something went wrong!");
-      }
+  const { isLoading, error, sendRequest: fetchMoviesSelect } = useHttp();
 
-      const data = await response.json();
+  const transformMovies = (movieObjs) => {
+    const loadedMovies = [];
 
-      const loadedMovies = [];
-
-      for (const key in data) {
-        loadedMovies.push({
-          id: key,
-          title: data[key].title,
-          openingText: data[key].openingText,
-          releaseDate: data[key].releaseDate,
-        });
-      }
-
-      setMovies(loadedMovies);
-    } catch (error) {
-      setError(error.message);
+    for (const key in movieObjs) {
+      loadedMovies.push({
+        id: key,
+        title: movieObjs[key].title,
+        openingText: movieObjs[key].openingText,
+        releaseDate: movieObjs[key].releaseDate,
+      });
     }
-    setIsLoading(false);
-  }, []);
+
+    setMovies(loadedMovies);
+  };
 
   useEffect(() => {
-    fetchMoviesHandler();
-  }, [fetchMoviesHandler]);
+    fetchMovies();
+  }, [fetchMoviesSelect]);
+
+  async function fetchMovies(movie) {
+    fetchMoviesSelect(
+      {
+        url: "https://react-http-8f511-default-rtdb.firebaseio.com/movies.json",
+      },
+      transformMovies
+    );
+  }
 
   async function addMovieHandler(movie) {
     const response = await fetch(
@@ -57,13 +49,8 @@ function App() {
       }
     );
 
-    const data = await response.json();
-
-    fetchMoviesHandler();
-  }
-
-  async function deleteMovieHandler(movie) {
-    console.log(movie);
+    await response.json();
+    fetchMovies();
   }
 
   let content = <p>Found no movies.</p>;
@@ -84,9 +71,8 @@ function App() {
     <React.Fragment>
       <div>
         <NewMovie onAdd={addMovieHandler}></NewMovie>
-
         <section>
-          <Button onClick={fetchMoviesHandler}>Fetch Movies</Button>
+          <Button onClick={fetchMovies}>Fetch Movies</Button>
         </section>
         <section>{content}</section>
       </div>
