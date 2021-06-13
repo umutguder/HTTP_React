@@ -39,18 +39,18 @@ function App() {
     );
   }
 
-  async function addMovieHandler(movie) {
-    const response = await fetch(
-      "https://react-http-8f511-default-rtdb.firebaseio.com/movies.json",
-      {
-        method: "POST",
-        body: JSON.stringify(movie),
-        header: { "Content-Type": "application/json" },
-      }
-    );
+  const { isLoadingaDD, erroraDD, sendRequest: addMovieReq } = useHttp();
 
-    await response.json();
-    fetchMovies();
+  async function addMovieHandler(movie) {
+    addMovieReq(
+      {
+        url: "https://react-http-8f511-default-rtdb.firebaseio.com/movies.json",
+        method: "POST",
+        body: movie,
+        header: { "Content-Type": "application/json" },
+      },
+      fetchMovies
+    );
   }
 
   let content = <p>Found no movies.</p>;
