@@ -1,6 +1,7 @@
 # HTTP requests in React
 
-GET/Post Movies from/to Firebase
+- GET/Post Movies from/to Firebase
+- Custom Hook definition and usage for HTTP requests
 
 In order to run the program, after download or pull run 
 - npm install 
